@@ -607,9 +607,8 @@ contract KartRacingLeague is ERC20, Ownable {
     mapping(address => bool) public Blacklist;
 
     event BlackListed(address wallet, bool status);
-    constructor(uint256 cap_) ERC20("Kart Racing League", "KRL") {
-        require(cap_ > 0, "ERC20Capped: cap is 0");
-        _cap = cap_;
+    constructor() ERC20("Kart Racing League", "KRL") {
+        _cap = 404000000*10**18;
     }
 
     function cap() public view virtual returns (uint256) {
