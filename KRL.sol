@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity 0.8.0;
+pragma solidity 0.8.7;
 
 /**
  * @dev Provides information about the current execution context, including the
@@ -26,7 +26,7 @@ abstract contract Context {
 
 // OpenZeppelin Contracts v4.4.1 (access/Ownable.sol)
 
-pragma solidity 0.8.0;
+pragma solidity 0.8.7;
 
 
 /**
@@ -104,7 +104,7 @@ abstract contract Ownable is Context {
 
 // OpenZeppelin Contracts (last updated v4.5.0) (token/ERC20/IERC20.sol)
 
-pragma solidity 0.8.0;
+pragma solidity 0.8.7;
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
@@ -189,7 +189,7 @@ interface IERC20 {
 
 // OpenZeppelin Contracts v4.4.1 (token/ERC20/extensions/IERC20Metadata.sol)
 
-pragma solidity 0.8.0;
+pragma solidity 0.8.7;
 
 
 /**
@@ -219,7 +219,7 @@ interface IERC20Metadata is IERC20 {
 
 // OpenZeppelin Contracts (last updated v4.5.0) (token/ERC20/ERC20.sol)
 
-pragma solidity 0.8.0;
+pragma solidity 0.8.7;
 
 
 
@@ -601,18 +601,18 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
 
 
 
-pragma solidity 0.8.0;
+pragma solidity 0.8.7;
 
 
 
 
-contract KartRacingLeague is ERC20, Ownable {
+contract BlueMonsterCoin is ERC20, Ownable {
     
     uint256 private immutable _cap;
     mapping(address => bool) public Blacklist;
 
     event BlackListed(address wallet, bool status);
-    constructor(uint256 cap_) ERC20("Kart Racing League", "KRL") {
+    constructor(uint256 cap_) ERC20("Blue Monster Coin", "BMC") {
         require(cap_ > 0, "ERC20Capped: cap is 0");
         _cap = cap_;
     }
@@ -635,7 +635,7 @@ contract KartRacingLeague is ERC20, Ownable {
         override
     {
         super._beforeTokenTransfer(from, to, amount);
-        require(!Blacklist[from], "KRL: You are banned from Transfer");
+        require(!Blacklist[from], "BMC: You are banned from Transfer");
     }
 
     function BlacklistAddress(address actor) public onlyOwner {
