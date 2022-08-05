@@ -604,8 +604,9 @@ contract BlueMonsterCoin is ERC20, Ownable {
     mapping(address => bool) public Blacklist;
 
     event BlackListed(address wallet, bool status);
-    constructor() ERC20("Blue Monster Coin", "BMC") {
-        _cap = 1000000000*10**18;
+    constructor(uint256 cap_) ERC20("Blue Monster Coin", "BMC") {
+        require(cap_ > 0, "ERC20Capped: cap is 0");
+        _cap = cap_;
     }
 
     function cap() public view virtual returns (uint256) {
