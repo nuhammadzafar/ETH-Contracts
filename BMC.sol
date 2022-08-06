@@ -1091,7 +1091,7 @@ contract BlueMonsterCoin is ERC20, ERC20Burnable, Pausable, AccessControl {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     address internal constant _safe = 0xd8806d66E24b702e0A56fb972b75D24CAd656821;
-
+    uint256 public MAX_SUPPLY = 1000000000000000000000000000;
     constructor() ERC20("Blue Monster Coin", "BMC") {
         _grantRole(DEFAULT_ADMIN_ROLE, _safe);
         _grantRole(PAUSER_ROLE, _safe);
@@ -1108,7 +1108,7 @@ contract BlueMonsterCoin is ERC20, ERC20Burnable, Pausable, AccessControl {
 
     function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
         require(
-            totalSupply() + amount <= 1000000000 * 1e18,
+            totalSupply() + amount <= MAX_SUPPLY,
             "Error: Max supply reached, 1 Billion tokens minted."
         );
         _mint(to, amount);
