@@ -5,7 +5,7 @@
 // OpenZeppelin Contracts v4.4.0 (utils/introspection/IERC165.sol)
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 /**
  * @dev Interface of the ERC165 standard, as defined in the
@@ -33,7 +33,7 @@ interface IERC165 {
 
 // OpenZeppelin Contracts v4.4.0 (utils/introspection/ERC165.sol)
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 
 /**
@@ -64,7 +64,7 @@ abstract contract ERC165 is IERC165 {
 
 // OpenZeppelin Contracts v4.4.0 (utils/Strings.sol)
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 /**
  * @dev String operations.
@@ -134,7 +134,7 @@ library Strings {
 
 // OpenZeppelin Contracts v4.4.0 (access/IAccessControl.sol)
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 /**
  * @dev External interface of AccessControl declared to support ERC165 detection.
@@ -224,7 +224,7 @@ interface IAccessControl {
 
 
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 /**
  * @dev Provides information about the current execution context, including the
@@ -251,7 +251,7 @@ abstract contract Context {
 
 // OpenZeppelin Contracts v4.4.0 (access/AccessControl.sol)
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 
 
@@ -476,7 +476,7 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
 
 // OpenZeppelin Contracts v4.4.0 (security/Pausable.sol)
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 
 /**
@@ -568,7 +568,7 @@ abstract contract Pausable is Context {
 
 
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 /**
  * @dev Interface of the ERC20 standard as defined in the EIP.
@@ -652,7 +652,7 @@ interface IERC20 {
 
 
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 
 /**
@@ -681,7 +681,7 @@ interface IERC20Metadata is IERC20 {
 
 
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 
 
@@ -1038,7 +1038,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
 
 
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 
 
@@ -1081,7 +1081,7 @@ abstract contract ERC20Burnable is Context, ERC20 {
 // File: contracts/BMC.sol
 
 
-pragma solidity 0.8.4;
+pragma solidity 0.8.7;
 
 
 
