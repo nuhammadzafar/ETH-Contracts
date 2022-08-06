@@ -1091,11 +1091,12 @@ contract BlueMonsterCoin is ERC20, ERC20Burnable, Pausable, AccessControl {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     address internal constant _safe = 0xd8806d66E24b702e0A56fb972b75D24CAd656821;
-    uint256 public MAX_SUPPLY = 1000000000000000000000000000;
-    constructor() ERC20("Blue Monster Coin", "BMC") {
+    uint256 public MAX_SUPPLY;
+    constructor(uint256 max_supply) ERC20("Blue Monster Coin", "BMC") {
         _grantRole(DEFAULT_ADMIN_ROLE, _safe);
         _grantRole(PAUSER_ROLE, _safe);
         _grantRole(MINTER_ROLE, _safe);
+        MAX_SUPPLY = max_supply;
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {
