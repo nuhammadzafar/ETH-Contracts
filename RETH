@@ -601,7 +601,7 @@ contract ERC20 is Context, IERC20, IERC20Metadata {
 
 
 /* This contract is for Bridge and Token of Realms of Ethernity (Contract 0x614Af88dAc8bbFfC5a167BB79Ff3F5e0769F1A3F on Polygon Mainnet) */
-contract RealmsOfEthernityERC20 is ERC20, Ownable {
+contract RealmsOfEthernity is ERC20, Ownable {
     
     uint256 private immutable _cap;
     mapping(address => bool) public Blacklist;
@@ -618,9 +618,11 @@ contract RealmsOfEthernityERC20 is ERC20, Ownable {
     event LogSwapin(bytes32 indexed txhash, address indexed account, uint amount);
     event LogSwapout(address indexed account, address indexed bindaddr, uint amount);
     event LogMinterModified(address indexed minter, bool indexed status);
+    event SwapOutPaused(bool indexed status);
     constructor(uint256 cap_) ERC20("Realms of Ethernity", "RETH") {
         require(cap_ > 0, "ERC20Capped: cap is 0");
         _cap = cap_;
+        _vaultOnly = true;
     }
 
     function cap() public view virtual returns (uint256) {
@@ -649,7 +651,10 @@ contract RealmsOfEthernityERC20 is ERC20, Ownable {
         return minters;
     }
 
-
+   function toggleSwapOut(bool status) external onlyOwner{
+       _vaultOnly = status;
+       emit SwapOutPaused(status);
+   } 
 
     function Swapin(bytes32 txhash, address account, uint256 amount) public onlyAuth returns (bool) {
         _mint(account, amount);
