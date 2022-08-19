@@ -1,14 +1,4 @@
-/**
- *Submitted for verification at Etherscan.io on 2022-08-10
-*/
 
-/**
- *Submitted for verification at polygonscan.com on 2022-05-19
-*/
-
-/**
- *Submitted for verification at polygonscan.com on 2022-05-17
-*/
 
 //SPDX-License-Identifier: Unlicensed
 
