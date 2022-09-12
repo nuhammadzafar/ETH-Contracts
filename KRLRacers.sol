@@ -2241,6 +2241,7 @@ contract KRLRacers is ERC721A,  Ownable {
     mapping(address=>uint256) private holderMinted;
     mapping(address=>uint256) private allowlistMinted;
     mapping(address=>bool) private collabMint;
+    mapping(address=> bool) public holderFees;
     Counters.Counter private _tokenIdCounter;
     event HolderSaleTimeChanged(uint256 startTime, uint256 endTime);
     event AllowListSaleTimeChanged(uint256 startTime, uint256 endTime);
@@ -2320,7 +2321,10 @@ contract KRLRacers is ERC721A,  Ownable {
         require(checkSign(signature,hash)==_signerAddress, "Invalid Signature");
         HOLDERS_MINTED+=quantity;
         require(checkHolderMinted()<=HOLDERS_LIMIT, "Mint would exceed limit");
-        require(msg.value == HOLDER_MINT_PRICE, "Send proper mint fees");
+        if(holderFees[msg.sender]==false){
+          require(msg.value == HOLDER_MINT_PRICE, "Send proper mint fees");
+          holderFees[msg.sender] = true;
+        }
         require(totalSupply().add(quantity)<=MAX_SUPPLY, "Exceeding Max Limit");            
         holderMinted[msg.sender]+=quantity;
         payable(owner()).transfer(msg.value);
