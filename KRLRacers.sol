@@ -1,10 +1,7 @@
-/**
- *Submitted for verification at Etherscan.io on 2022-09-12
-*/
+
 
 // SPDX-License-Identifier: MIT
-// ERC721A Contracts v4.2.2
-// Creator: Chiru Labs
+
 
 pragma solidity ^0.8.4;
 
@@ -2324,10 +2321,10 @@ contract KRLRacers is ERC721A,  Ownable {
         if(holderFees[msg.sender]==false){
           require(msg.value == HOLDER_MINT_PRICE, "Send proper mint fees");
           holderFees[msg.sender] = true;
+          payable(owner()).transfer(msg.value);  
         }
         require(totalSupply().add(quantity)<=MAX_SUPPLY, "Exceeding Max Limit");            
         holderMinted[msg.sender]+=quantity;
-        payable(owner()).transfer(msg.value);
         _safeMint(msg.sender, quantity);
       
     }
