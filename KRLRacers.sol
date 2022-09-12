@@ -2386,6 +2386,7 @@ contract KRLRacers is ERC721A,  Ownable {
         root = _root;
     }
     function burn(uint256 tokenId)public {
+        require(ownerOf(tokenId)==msg.sender,"you are not owner of token");
             _burn(tokenId);
     }
 
