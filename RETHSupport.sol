@@ -389,22 +389,39 @@ interface RealmsOfEthernity {
 
 contract RETHSupportTransaction is Ownable
 {
-    event SwappedIn(address user , uint256 amount , bytes32 hash  );
     using ECDSA for bytes32;
-   address private _signerAddress;
-   mapping(bytes=>bool) public usedSigns;
-   RealmsOfEthernity tokenaddess ;
+    address private _signerAddress;
+    mapping(bytes=>bool) public usedSigns;
+    bool public swapOn;
+    event SwapStatusChanged(bool status);
+    event SwappedIn(address user, uint256 amount, bytes32 hash);
+
+
+    RealmsOfEthernity public tokenAddress ;
    
     constructor(
         address signerAddress_,
-        RealmsOfEthernity  _tokenaddess
+        RealmsOfEthernity  _tokenaddress
     ) {
         _signerAddress = signerAddress_;
-        tokenaddess=_tokenaddess;
+        tokenAddress=_tokenaddress;
+        swapOn = true;
     }
 
-    function swappIN (uint256 amount , bytes calldata signature, bytes32 txhash) public returns (bool)
-    {
+    function changeSigner(address _signer) public onlyOwner {
+        _signerAddress = _signer;
+    }
+    function changeStatus(bool status) public onlyOwner {
+        swapOn = status;
+        emit SwapStatusChanged(status);
+    }
+
+    modifier whenSwapIsOn {
+        require(swapOn==true, "Swap is not Allowed");
+        _;
+    }
+
+    function swappIN (uint256 amount , bytes calldata signature, bytes32 txhash) public whenSwapIsOn returns (bool) {
         require(usedSigns[signature]==false, "Duplicate");
         require(_signerAddress == keccak256(
             abi.encodePacked(
@@ -413,7 +430,7 @@ contract RETHSupportTransaction is Ownable
             )
         ).recover(signature), "Signer address mismatch.");
         usedSigns[signature] = true;
-        tokenaddess.Swapin(txhash,msg.sender,amount);
+        tokenAddress.Swapin(txhash,msg.sender,amount);
        emit SwappedIn(msg.sender,amount,txhash);
         return true ;
 
