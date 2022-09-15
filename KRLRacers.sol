@@ -2225,6 +2225,7 @@ contract KRLRacers is ERC721A,  Ownable {
     uint256 public immutable MAX_SUPPLY = 12000;
     uint256 public immutable HOLDERS_LIMIT = 7681;
     uint256 public immutable ALLOWLIST_LIMIT = 4000;
+    uint256 public CURRENT_ALLOWLIST_CAP;
     uint256 public HOLDER_MINT_PRICE;
     uint256 public MINT_PRICE;
     uint256 private HOLDERS_MINTED;
@@ -2275,7 +2276,11 @@ contract KRLRacers is ERC721A,  Ownable {
     }
 
     function availableForAllowlist() public view whenAllowlistSaleIsOn returns(uint256){
-        return ALLOWLIST_LIMIT.add(HOLDERS_LIMIT.sub(HOLDERS_MINTED));
+        if(block.timestamp>HOLDER_SALE_END_TIME){
+        return CURRENT_ALLOWLIST_CAP.add(HOLDERS_LIMIT.sub(HOLDERS_MINTED));
+        } else {
+            return CURRENT_ALLOWLIST_CAP;
+        }
     }
 
     modifier whenHolderSaleIsOn {
@@ -2296,16 +2301,18 @@ contract KRLRacers is ERC721A,  Ownable {
         emit HolderSaleTimeChanged(startTime, endTime);
     }
 
-    function changeAllowlistTime(uint256 startTime, uint256 endTime) public onlyOwner{
+    function startAllowlistPhase(uint256 cap, uint256 startTime, uint256 endTime) public onlyOwner{
+        require(cap>ALLOWLIST_LIMIT, "Cant set more than max limit");
+        CURRENT_ALLOWLIST_CAP = cap;
         ALLOWLIST_SALE_START_TIME = startTime;
         ALLOWLIST_SALE_END_TIME = endTime;
-        emit HolderSaleTimeChanged(startTime, endTime);
+        emit AllowListSaleTimeChanged(startTime, endTime);
     }
 
     function changePublicSaleTime(uint256 startTime, uint256 endTime) public onlyOwner{
         PUBLIC_SALE_START_TIME = startTime;
         PUBLIC_SALE_END_TIME = endTime;
-        emit HolderSaleTimeChanged(startTime, endTime);
+        emit PublicSaleTimeChanged(startTime, endTime);
     }
 
     function changeSIgnerwallet(address _signerWallet) public onlyOwner {
