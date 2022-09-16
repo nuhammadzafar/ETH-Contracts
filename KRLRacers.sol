@@ -2319,10 +2319,12 @@ contract KRLRacers is ERC721A,  Ownable {
         _signerAddress = _signerWallet;
     }
 
-    function holderMint(uint256 quantity, bytes calldata signature, bytes calldata hash) public payable whenHolderSaleIsOn {
+
+
+    function holderMintNew(uint256 quantity, bytes calldata signature) public payable whenHolderSaleIsOn {
         require(usedSigns[signature]==false,"signature already use");
         usedSigns[signature]=true;
-        require(checkSign(signature,hash)==_signerAddress, "Invalid Signature");
+        require(checkSign(signature,quantity)==_signerAddress, "Invalid Signature");
         HOLDERS_MINTED+=quantity;
         require(checkHolderMinted()<=HOLDERS_LIMIT, "Mint would exceed limit");
         if(holderFees[msg.sender]==false){
@@ -2357,10 +2359,10 @@ contract KRLRacers is ERC721A,  Ownable {
      
     }
 
-    function CollabMint(uint256 quantity, bytes calldata signature, bytes calldata hash ) public payable {
+    function CollabMint(uint256 quantity, bytes calldata signature) public payable {
         require(usedSigns[signature]==false,"signature already use");
         usedSigns[signature]=true;
-        require(checkSign(signature,hash)==_signerAddress, "Invalid Signature");
+        require(checkSign(signature,quantity)==_signerAddress, "Invalid Signature");
         require(msg.value == MINT_PRICE.mul(quantity), "Send proper mint fees");
         require(totalSupply().add(quantity)<=MAX_SUPPLY, "Exceeding Max Limit");            
         payable(owner()).transfer(msg.value);
@@ -2373,11 +2375,11 @@ contract KRLRacers is ERC721A,  Ownable {
         baseURI_ = baseuri;
     }
 
-  function checkSign(bytes calldata signature,bytes calldata hash) private pure returns (address) {
+  function checkSign(bytes calldata signature,uint256 quantity) private view returns (address) {
         return keccak256(
             abi.encodePacked(
                "\x19Ethereum Signed Message:\n32",
-                keccak256(abi.encodePacked(hash))    
+                keccak256(abi.encodePacked(totalSupply().add(quantity)))    
             )
         ).recover(signature);
     }
