@@ -1,4 +1,6 @@
-
+/**
+ *Submitted for verification at Etherscan.io on 2022-09-18
+*/
 
 // SPDX-License-Identifier: MIT
 
@@ -2232,8 +2234,8 @@ contract KRLRacers is ERC721A,  Ownable {
     uint256 private ALLOWLIST_MINTED;
     uint256 public HOLDER_SALE_START_TIME;
     uint256 public HOLDER_SALE_END_TIME;
-    uint256 public ALLOWLIST_SALE_START_TIME;
-    uint256 public ALLOWLIST_SALE_END_TIME;
+    uint256 public ALLOWLIST_SALE_START_TIME=1663963200;
+    uint256 public ALLOWLIST_SALE_END_TIME=1664568000;
     uint256 public PUBLIC_SALE_START_TIME;
     uint256 public PUBLIC_SALE_END_TIME;   
     mapping(address=>uint256) private holderMinted;
@@ -2249,8 +2251,8 @@ contract KRLRacers is ERC721A,  Ownable {
     constructor(address signerAddress_) ERC721A("KRLRacers", "Racers") {       
         _signerAddress = signerAddress_;
         HOLDER_MINT_PRICE = 0.03 ether;
-        HOLDER_SALE_START_TIME =1662554159;
-        HOLDER_SALE_END_TIME = 1665146159;
+        HOLDER_SALE_START_TIME =1663617600;
+        HOLDER_SALE_END_TIME = 1664481600;
         MINT_PRICE = 0.09 ether;
     }
 
@@ -2275,7 +2277,8 @@ contract KRLRacers is ERC721A,  Ownable {
         return baseURI_;
     }
 
-    function availableForAllowlist() public view whenAllowlistSaleIsOn returns(uint256){
+    function availableForAllowlist() public view  returns(uint256){
+        require(whenAllowlistSaleIsOn()==true,"whitelist sale not start yet" );
         if(block.timestamp>HOLDER_SALE_END_TIME){
         return CURRENT_ALLOWLIST_CAP.add(HOLDERS_LIMIT.sub(HOLDERS_MINTED));
         } else {
@@ -2283,17 +2286,35 @@ contract KRLRacers is ERC721A,  Ownable {
         }
     }
 
-    modifier whenHolderSaleIsOn {
-        require(block.timestamp > HOLDER_SALE_START_TIME && block.timestamp < HOLDER_SALE_END_TIME, "Holders sale is not on");
-        _;
+    function whenHolderSaleIsOn() public view  returns (bool) {
+        if(block.timestamp > HOLDER_SALE_START_TIME && block.timestamp < HOLDER_SALE_END_TIME)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
-    modifier whenAllowlistSaleIsOn {
-        require(block.timestamp > ALLOWLIST_SALE_START_TIME && block.timestamp < ALLOWLIST_SALE_END_TIME, "Allowlist sale is not on");
-        _;
+    function whenAllowlistSaleIsOn() public view  returns (bool) {
+        if(block.timestamp > ALLOWLIST_SALE_START_TIME && block.timestamp < ALLOWLIST_SALE_END_TIME)
+        {
+            return true;
+        }
+        else {
+             return false;
+        }
+        
     }
-    modifier whenPublicaleIsOn {
-        require(block.timestamp > PUBLIC_SALE_START_TIME && block.timestamp < PUBLIC_SALE_END_TIME, "Public Sale is not on");
-        _;
+    function whenPublicaleIsOn()public view  returns (bool) {
+        if(block.timestamp > PUBLIC_SALE_START_TIME && block.timestamp < PUBLIC_SALE_END_TIME)
+        {
+            return true;
+        }
+        else 
+        {
+            return false;
+        }
+        
     }    
     function changeHolderSaleTime(uint256 startTime, uint256 endTime) public onlyOwner{
         HOLDER_SALE_START_TIME = startTime;
@@ -2302,7 +2323,7 @@ contract KRLRacers is ERC721A,  Ownable {
     }
 
     function startAllowlistPhase(uint256 cap, uint256 startTime, uint256 endTime) public onlyOwner{
-        require(cap>ALLOWLIST_LIMIT, "Cant set more than max limit");
+        require(cap<ALLOWLIST_LIMIT, "Cant set more than max limit");
         CURRENT_ALLOWLIST_CAP = cap;
         ALLOWLIST_SALE_START_TIME = startTime;
         ALLOWLIST_SALE_END_TIME = endTime;
@@ -2321,7 +2342,8 @@ contract KRLRacers is ERC721A,  Ownable {
 
 
 
-    function holderMintNew(uint256 quantity, bytes calldata signature) public payable whenHolderSaleIsOn {
+    function holderMintNew(uint256 quantity, bytes calldata signature) public payable  {
+        require(whenHolderSaleIsOn()==true,"Holder sale is not ON");
         require(usedSigns[signature]==false,"signature already use");
         usedSigns[signature]=true;
         require(checkSign(signature,quantity)==_signerAddress, "Invalid Signature");
@@ -2338,7 +2360,8 @@ contract KRLRacers is ERC721A,  Ownable {
       
     }
 
-    function allowListMint(uint256 quantity, bytes32[] calldata proof) public payable whenAllowlistSaleIsOn {
+    function allowListMint(uint256 quantity, bytes32[] calldata proof) public payable  {
+         require(whenAllowlistSaleIsOn()==true,"whitelist sale not start yet" );
        require(isValid(proof, keccak256(abi.encodePacked(msg.sender))), "Not a part of Allowlist");
        require(msg.value == quantity * MINT_PRICE, "Send proper msg value");
        require(totalSupply().add(quantity)<=MAX_SUPPLY, "Exceeding Max Limit");
@@ -2351,7 +2374,8 @@ contract KRLRacers is ERC721A,  Ownable {
 
 
 
-    function publicMint(uint256 quantity) public payable whenPublicaleIsOn {
+    function publicMint(uint256 quantity) public payable  {
+       require(whenPublicaleIsOn()==true,"public sale is not on");
        require(msg.value == quantity * MINT_PRICE, "Send proper msg value");
        require(totalSupply().add(quantity)<=MAX_SUPPLY, "Exceeding Max Limit");
        payable(owner()).transfer(msg.value);
