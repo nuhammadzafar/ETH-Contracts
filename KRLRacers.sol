@@ -2305,7 +2305,7 @@ contract KRLRacers is ERC721A,  Ownable {
         }
         
     }
-    function whenPublicaleIsOn()public view  returns (bool) {
+    function whenPublicaleIsOn() public view  returns (bool) {
         if(block.timestamp > PUBLIC_SALE_START_TIME && block.timestamp < PUBLIC_SALE_END_TIME)
         {
             return true;
@@ -2346,22 +2346,22 @@ contract KRLRacers is ERC721A,  Ownable {
         require(whenHolderSaleIsOn()==true,"Holder sale is not ON");
         require(usedSigns[signature]==false,"signature already use");
         usedSigns[signature]=true;
-        require(checkSign(signature,quantity)==_signerAddress, "Invalid Signature");
         HOLDERS_MINTED+=quantity;
+        holderMinted[msg.sender]+=quantity;
         require(checkHolderMinted()<=HOLDERS_LIMIT, "Mint would exceed limit");
+        require(checkSign(signature,quantity)==_signerAddress, "Invalid Signature");
         if(holderFees[msg.sender]==false){
           require(msg.value == HOLDER_MINT_PRICE, "Send proper mint fees");
           holderFees[msg.sender] = true;
           payable(owner()).transfer(msg.value);  
         }
         require(totalSupply().add(quantity)<=MAX_SUPPLY, "Exceeding Max Limit");            
-        holderMinted[msg.sender]+=quantity;
         _safeMint(msg.sender, quantity);
       
     }
 
     function allowListMint(uint256 quantity, bytes32[] calldata proof) public payable  {
-         require(whenAllowlistSaleIsOn()==true,"whitelist sale not start yet" );
+       require(whenAllowlistSaleIsOn()==true,"whitelist sale not start yet" );
        require(isValid(proof, keccak256(abi.encodePacked(msg.sender))), "Not a part of Allowlist");
        require(msg.value == quantity * MINT_PRICE, "Send proper msg value");
        require(totalSupply().add(quantity)<=MAX_SUPPLY, "Exceeding Max Limit");
