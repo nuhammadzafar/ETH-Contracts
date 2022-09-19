@@ -1,9 +1,6 @@
-/**
- *Submitted for verification at Etherscan.io on 2022-09-18
-*/
+
 
 // SPDX-License-Identifier: MIT
-
 
 pragma solidity ^0.8.4;
 
@@ -2222,25 +2219,25 @@ contract KRLRacers is ERC721A,  Ownable {
     using ECDSA for bytes32;
     bytes32 public root;
     address private _signerAddress;
+    address public saleModifier;
     string private baseURI_;
     mapping(bytes=>bool) public usedSigns;
     uint256 public immutable MAX_SUPPLY = 12000;
     uint256 public immutable HOLDERS_LIMIT = 7681;
     uint256 public immutable ALLOWLIST_LIMIT = 4000;
-    uint256 public CURRENT_ALLOWLIST_CAP;
-    uint256 public HOLDER_MINT_PRICE;
-    uint256 public MINT_PRICE;
+    uint256 public HOLDER_MINT_PRICE =0.03 ether;
+    uint256 public MINT_PRICE=0.09 ether;
     uint256 private HOLDERS_MINTED;
     uint256 private ALLOWLIST_MINTED;
-    uint256 public HOLDER_SALE_START_TIME;
-    uint256 public HOLDER_SALE_END_TIME;
-    uint256 public ALLOWLIST_SALE_START_TIME=1663963200;
-    uint256 public ALLOWLIST_SALE_END_TIME=1664568000;
+    uint256 public HOLDER_SALE_START_TIME=1663682400;
+    uint256 public HOLDER_SALE_END_TIME=1664546400;
+    uint256 public ALLOWLIST_SALE_START_TIME=1664028000;
+    uint256 public ALLOWLIST_SALE_END_TIME=1666447200;
     uint256 public PUBLIC_SALE_START_TIME;
     uint256 public PUBLIC_SALE_END_TIME;   
     mapping(address=>uint256) private holderMinted;
     mapping(address=>uint256) private allowlistMinted;
-    mapping(address=>bool) private collabMint;
+    mapping(address=>uint256) private collabMinted;
     mapping(address=> bool) public holderFees;
     Counters.Counter private _tokenIdCounter;
     event HolderSaleTimeChanged(uint256 startTime, uint256 endTime);
@@ -2250,10 +2247,6 @@ contract KRLRacers is ERC721A,  Ownable {
 
     constructor(address signerAddress_) ERC721A("KRLRacers", "Racers") {       
         _signerAddress = signerAddress_;
-        HOLDER_MINT_PRICE = 0.03 ether;
-        HOLDER_SALE_START_TIME =1663617600;
-        HOLDER_SALE_END_TIME = 1664481600;
-        MINT_PRICE = 0.09 ether;
     }
 
     function checkHolderWallet(address wallet) public view returns(uint256) {
@@ -2262,9 +2255,10 @@ contract KRLRacers is ERC721A,  Ownable {
     function checkAllowlistWallet(address wallet) public view returns(uint256) {
         return allowlistMinted[wallet];
     }
-    function isAllowedCollab(address wallet) public view returns(bool){
-        return collabMint[wallet];
+    function checkCollabWalletMinted(address wallet) public view returns(uint256) {
+        return allowlistMinted[wallet];
     }
+
     function checkHolderMinted() public view returns(uint256){
         return HOLDERS_MINTED;
     }
@@ -2277,12 +2271,17 @@ contract KRLRacers is ERC721A,  Ownable {
         return baseURI_;
     }
 
+    modifier isModifier {
+        require(msg.sender == owner() || msg.sender ==saleModifier, "You cant do it");
+        _;
+    }
+
     function availableForAllowlist() public view  returns(uint256){
         require(whenAllowlistSaleIsOn()==true,"whitelist sale not start yet" );
         if(block.timestamp>HOLDER_SALE_END_TIME){
-        return CURRENT_ALLOWLIST_CAP.add(HOLDERS_LIMIT.sub(HOLDERS_MINTED));
+        return checkPhaseLimit().add(HOLDERS_LIMIT.sub(HOLDERS_MINTED));
         } else {
-            return CURRENT_ALLOWLIST_CAP;
+            return checkPhaseLimit();
         }
     }
 
@@ -2316,31 +2315,53 @@ contract KRLRacers is ERC721A,  Ownable {
         }
         
     }    
-    function changeHolderSaleTime(uint256 startTime, uint256 endTime) public onlyOwner{
+
+    function checkPhaseLimit() public view returns(uint256 phaseLimit){
+        if(block.timestamp>1665842400){
+            /* 15 October 2 PM UTC */
+            return 4000;
+        }
+        else if(block.timestamp>1665237600){
+            /* 8 October 2 PM UTC */
+            return 3000;
+        }
+        else if(block.timestamp>1664632800){
+            /* 1 October 2 PM UTC */
+            return 2000;
+        }
+        else if(block.timestamp>1664028000){
+            /* 24 September 2 PM UTC */
+            return 1000;
+        } else {
+            return 0;
+        }
+    }
+
+    function changeHolderSaleTime(uint256 startTime, uint256 endTime) public isModifier {
         HOLDER_SALE_START_TIME = startTime;
         HOLDER_SALE_END_TIME = endTime;
         emit HolderSaleTimeChanged(startTime, endTime);
     }
 
-    function startAllowlistPhase(uint256 cap, uint256 startTime, uint256 endTime) public onlyOwner{
-        require(cap<ALLOWLIST_LIMIT, "Cant set more than max limit");
-        CURRENT_ALLOWLIST_CAP = cap;
+    function startAllowlistPhase(uint256 startTime, uint256 endTime) public isModifier {
         ALLOWLIST_SALE_START_TIME = startTime;
         ALLOWLIST_SALE_END_TIME = endTime;
         emit AllowListSaleTimeChanged(startTime, endTime);
     }
 
-    function changePublicSaleTime(uint256 startTime, uint256 endTime) public onlyOwner{
+    function changePublicSaleTime(uint256 startTime, uint256 endTime) public isModifier {
         PUBLIC_SALE_START_TIME = startTime;
         PUBLIC_SALE_END_TIME = endTime;
         emit PublicSaleTimeChanged(startTime, endTime);
     }
 
-    function changeSIgnerwallet(address _signerWallet) public onlyOwner {
+    function changeSignerwallet(address _signerWallet) public isModifier {
         _signerAddress = _signerWallet;
     }
 
-
+    function setSaleModifier(address wallet) public isModifier {
+        saleModifier = wallet;
+    }
 
     function holderMintNew(uint256 quantity, bytes calldata signature) public payable  {
         require(whenHolderSaleIsOn()==true,"Holder sale is not ON");
@@ -2386,7 +2407,7 @@ contract KRLRacers is ERC721A,  Ownable {
     function CollabMint(uint256 quantity, bytes calldata signature) public payable {
         require(usedSigns[signature]==false,"signature already use");
         usedSigns[signature]=true;
-        require(checkSign(signature,quantity)==_signerAddress, "Invalid Signature");
+        require(checkCollabSign(signature)==_signerAddress, "Invalid Signature");
         require(msg.value == MINT_PRICE.mul(quantity), "Send proper mint fees");
         require(totalSupply().add(quantity)<=MAX_SUPPLY, "Exceeding Max Limit");            
         payable(owner()).transfer(msg.value);
@@ -2408,21 +2429,30 @@ contract KRLRacers is ERC721A,  Ownable {
         ).recover(signature);
     }
 
+    function getsignInput(address wallet, uint256 amt) public pure returns(bytes32){
+        return((keccak256(abi.encodePacked([keccak256(abi.encodePacked(wallet)), bytes32(amt)]))));
+    }
+    
+    function checkCollabSign(bytes calldata signature) public view returns (address) {
+        return keccak256(
+            abi.encodePacked(
+               "\x19Ethereum Signed Message:\n32",
+                (getsignInput(msg.sender, checkCollabWalletMinted(msg.sender)))  
+            )
+        ).recover(signature);
+    }
+    
     function isValid(bytes32[] memory proof, bytes32 leaf) public view returns (bool) {
         return MerkleProof.verify(proof, root, leaf);
     }
 
-    function setRoot(bytes32 _root) public onlyOwner {
+    function setRoot(bytes32 _root) public isModifier {
         root = _root;
     }
-    function burn(uint256 tokenId)public {
-        require(ownerOf(tokenId)==msg.sender,"you are not owner of token");
+    function burn(uint256 tokenId) public {
+        require(ownerOf(tokenId) == msg.sender,"you are not owner of token");
             _burn(tokenId);
     }
-
-    // The following functions are overrides required by Solidity.
-
-  
 
 
 }
