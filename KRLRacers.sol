@@ -2453,6 +2453,10 @@ contract KRLRacers is ERC721A,  Ownable {
         require(ownerOf(tokenId) == msg.sender,"you are not owner of token");
             _burn(tokenId);
     }
+    function withdrawEth(uint256 amount) public onlyOwner
+    {
+     payable(owner()).transfer(amount);
+    }
 
 
 }
