@@ -2370,7 +2370,7 @@ contract KRLRacers is ERC721A,  Ownable {
         HOLDERS_MINTED+=quantity;
         holderMinted[msg.sender]+=quantity;
         require(checkHolderMinted()<=HOLDERS_LIMIT, "Mint would exceed limit");
-        require(checkSign(signature,quantity)==_signerAddress, "Invalid Signature");
+        require(checkSign(signature)==_signerAddress, "Invalid Signature");
         if(holderFees[msg.sender]==false){
           require(msg.value == HOLDER_MINT_PRICE, "Send proper mint fees");
           holderFees[msg.sender] = true;
@@ -2420,11 +2420,11 @@ contract KRLRacers is ERC721A,  Ownable {
         baseURI_ = baseuri;
     }
 
-  function checkSign(bytes calldata signature,uint256 quantity) private view returns (address) {
+  function checkSign(bytes calldata signature) public view returns (address) {
         return keccak256(
             abi.encodePacked(
                "\x19Ethereum Signed Message:\n32",
-                keccak256(abi.encodePacked(totalSupply().add(quantity)))    
+                (getsignInput(msg.sender, checkHolderWallet(msg.sender))) 
             )
         ).recover(signature);
     }
